@@ -17,5 +17,5 @@ az ad app update --id $AppId --required-resource-accesses role.json
 rm role.json
 echo -e "\n\nApplication Name = $AppName \nApplication ID = $AppId \nApplication Key = $AppKey \nTenant ID = $TenantId \nSubscription ID = $SubscriptionId"
 
-echo -e "\n\n\nCopy the token below and paste it into Colony's Azure authentication page \n$AppId,$AppKey,$TenantId,$SubscriptionId"
+echo -e "\n\n\nCopy the token below and paste it into Colony's Azure authentication page \n\nTOKEN\n$AppId,$AppKey,$TenantId,$SubscriptionId"
 
