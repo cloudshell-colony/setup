@@ -1,14 +1,14 @@
-echo preparing integration parameters
+echo -e "preparing integration parameters"
 AppName=$(echo "COLONY"$RANDOM)
 AppKey=$(openssl rand -base64 32)
 TenantId=$(az account show --query tenantId -o tsv)
 SubscriptionId=$(az account show --query id -o tsv)
  
-echo creating AD application for CloudShell Colony
+echo -e "creating AD application for CloudShell Colony"
 az ad sp create-for-rbac -n $AppName --password $AppKey
 AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
  
-echo Configuring access to Azure API
+echo -e "Configuring access to Azure API"
 bash -c "cat >> role.json" <<EOL
 [{"resourceAppId": "797f4846-ba00-4fd7-ba43-dac1f8f63013","resourceAccess":[{"id": "41094075-9dad-400e-a0bd-54e686782033", "type":"Scope"}]}]
 EOL
