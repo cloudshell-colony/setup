@@ -1,7 +1,7 @@
 echo -e "preparing integration parameters"
 REGION="westeurope"
 AppName=$(echo "COLONY"$RANDOM)
-ColonyMgmtRG=$(echo "Colony-mgmt-"$RANDOM)
+ColonyMgmtRG=$(echo "colony-mgmt-"$RANDOM)
 StorageName=$(echo "storagecolonymgmt"$RANDOM)
 CosmosDbName=$(echo ""$ColonyMgmtRG"-sandbox-db")
 
