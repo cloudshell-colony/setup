@@ -1,3 +1,4 @@
+#!/bin/bash
 echo -e "preparing integration parameters"
 REGION="westeurope"
 AppName=$(echo "COLONY"$RANDOM)
@@ -24,15 +25,15 @@ SubscriptionId=$(az account show --query id -o tsv)
 #echo -e "\n\nApplication Name = $AppName \nApplication ID = $AppId \nApplication Key = $AppKey \nTenant ID = $TenantId \nSubscription ID = $SubscriptionId"
 
 #1.create resource group:
-echo "---Creating colony resource group "$ColonyMgmtRG
+echo "---Creating colony resource group (1/3) "$ColonyMgmtRG
 az group create -l $REGION -n $ColonyMgmtRG
 
 #2.Create mongo API cosmos db:
-echo "---Creating cosmos DB "$CosmosDbName
+echo "---Creating cosmos DB (2/3)"$CosmosDbName
 az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
 
 #3.Create the storage account:
-echo "---Creating storage account "$StorageName
+echo "---Creating storage account (3/3)"$StorageName
 az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS --tags colony-mgmt-storage:''
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
