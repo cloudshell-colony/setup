@@ -10,7 +10,6 @@ AppKey=$(openssl rand -base64 32)
 TenantId=$(az account show --query tenantId -o tsv)
 SubscriptionId=$(az account show --query id -o tsv)
 
- 
 #echo -e "creating AD application for CloudShell Colony"
 #az ad sp create-for-rbac -n $AppName --password $AppKey
 #AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
@@ -28,6 +27,13 @@ SubscriptionId=$(az account show --query id -o tsv)
 echo "---Creating colony resource group (1/3) "$ColonyMgmtRG
 az group create -l $REGION -n $ColonyMgmtRG
 
+echo "---Verify Resource group exists "$StorageName 
+
+if [ "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
+        echo "Resource group $ColonyMgmtRG exists"
+fi
+
+
 #2.Create mongo API cosmos db:
 echo "---Creating cosmos DB (2/3)"$CosmosDbName
 az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
@@ -35,6 +41,7 @@ az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
 #3.Create the storage account:
 echo "---Creating storage account (3/3)"$StorageName
 az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS --tags colony-mgmt-storage:''
+
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo -e "Copy the token below and paste it into Colony's Azure authentication page \n\nTOKEN\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG"
