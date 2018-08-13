@@ -28,12 +28,15 @@ echo "Creating colony resource group "$ColonyMgmtRG
 az group create -l $REGION -n $ColonyMgmtRG
 
 #2.Create mongo API cosmos db:
-echo "Creating cosmos DB "$ColonyMgmtRG
+echo "Creating cosmos DB "$ColonyMgmtRG"-sandbox-db"
 az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName"-sandbox-db" --kind MongoDB
 
 #3.Create the storage account:
+echo "Creating storage account "$StorageName
 az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS --tags colony-mgmt-storage:''
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo -e "Copy the token below and paste it into Colony's Azure authentication page \n\nTOKEN\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG"
 echo -e "-------------------------------------------------------------------------\n\n"
+
+echo "Done"
