@@ -29,7 +29,7 @@ az group create -l $REGION -n $ColonyMgmtRG
 
 #2.Create mongo API cosmos db:
 echo "---Creating cosmos DB "$CosmosDbName
-echo az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName" --kind MongoDB
+echo az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
 
 #3.Create the storage account:
 echo "---Creating storage account "$StorageName
