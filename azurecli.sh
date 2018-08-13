@@ -3,7 +3,7 @@ REGION="westeurope"
 AppName=$(echo "COLONY"$RANDOM)
 ColonyMgmtRG=$(echo "Colony-mgmt-"$RANDOM)
 StorageName=$(echo "storagecolonymgmt"$RANDOM)
-CosmosDbName=$(echo $ColonyMgmtRG"-sandbox-db")
+CosmosDbName=$(echo ""$ColonyMgmtRG"-sandbox-db")
 
 AppKey=$(openssl rand -base64 32)
 TenantId=$(az account show --query tenantId -o tsv)
