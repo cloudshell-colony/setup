@@ -27,7 +27,7 @@ SubscriptionId=$(az account show --query id -o tsv)
 echo "---Creating colony resource group (1/3) "$ColonyMgmtRG
 az group create -l $REGION -n $ColonyMgmtRG
 
-echo "---Verify Resource group exists "$StorageName 
+echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
 if [ "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
         echo "Resource group $ColonyMgmtRG exists"
