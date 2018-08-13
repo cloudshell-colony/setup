@@ -1,7 +1,7 @@
 echo -e "preparing integration parameters"
 REGION="westeurope"
 AppName=$(echo "COLONY"$RANDOM)
-ColonyMgmtRG=$(echo "ColonyMgmt"$RANDOM)
+ColonyMgmtRG=$(echo "Colony-mgmt-"$RANDOM)
 StorageName=$(echo "storagecolonymgmt"$RANDOM)
 CosmosDbName=$($ColonyMgmtRG"-sandbox-db")
 
@@ -28,8 +28,9 @@ echo "Creating colony resource group "$ColonyMgmtRG
 az group create -l $REGION -n $ColonyMgmtRG
 
 #2.Create mongo API cosmos db:
-echo "Creating cosmos DB "$ColonyMgmtRG"-sandbox-db"
-az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName"-sandbox-db" --kind MongoDB
+echo "Creating cosmos DB "$CosmosDbName
+echo az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName" --kind MongoDB
+echo az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName" --kind MongoDB
 
 #3.Create the storage account:
 echo "Creating storage account "$StorageName
