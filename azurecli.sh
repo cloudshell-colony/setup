@@ -33,18 +33,19 @@ if [ "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
         echo "Resource group $ColonyMgmtRG exists"
 fi
 
+#2.Create the storage account:
+echo "---Creating storage account (2/3)"$StorageName
+az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS --tags colony-mgmt-storage=''
 
-#2.Create mongo API cosmos db:
-echo "---Creating cosmos DB (2/3)"$CosmosDbName
+#3.Create mongo API cosmos db:
+echo "---Creating cosmos DB (3/3)"$CosmosDbName
 az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
 
-#3.Create the storage account:
-echo "---Creating storage account (3/3)"$StorageName
-az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS --tags colony-mgmt-storage=''
+
 
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
-echo -e "Copy the token below and paste it into Colony's Azure authentication page \n\nTOKEN\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG"
+echo -e "Copy the token below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG"
 echo -e "-------------------------------------------------------------------------\n\n"
 
 echo "Done"
