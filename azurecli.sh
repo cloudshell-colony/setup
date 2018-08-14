@@ -1,14 +1,26 @@
 #!/bin/bash
-echo -e "preparing integration parameters"
-REGION="westeurope"
-AppName=$(echo "COLONY"$RANDOM)
-ColonyMgmtRG=$(echo "colony-mgmt-"$RANDOM)
-StorageName=$(echo "storagecolonymgmt"$RANDOM)
-CosmosDbName=$(echo ""$ColonyMgmtRG"-sandbox-db")
 
+echo -e "Preparing integration parameters"
+
+#creting a random key
+COLONY_RANDOM=$(date +%s | sha256sum | base64 | head -c 12;echo)$(echo $RANDOM)
+COLONY_RANDOM="$(echo $COLONY_RANDOM | tr '[A-Z]' '[a-z]')"
+
+
+AppName=$(echo "COLONY"$COLONY_RANDOM)
+ColonyMgmtRG=$(echo "colony-mgmt-"$COLONY_RANDOM)
+StorageName=$(echo "storagecolonymgmt"$COLONY_RANDOM)
+CosmosDbName=$(echo ""$ColonyMgmtRG"-sandbox-db")
 AppKey=$(openssl rand -base64 32)
 TenantId=$(az account show --query tenantId -o tsv)
 SubscriptionId=$(az account show --query id -o tsv)
+
+REGION="westeurope"
+if [ ! -z "$1" ]
+then
+      echo "will use $1 region"
+      REGION=$1      
+fi
 
 #echo -e "creating AD application for CloudShell Colony"
 #az ad sp create-for-rbac -n $AppName --password $AppKey
