@@ -40,7 +40,7 @@ az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
 
 #3.Create the storage account:
 echo "---Creating storage account (3/3)"$StorageName
-az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS --tags colony-mgmt-storage:''
+az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS --tags colony-mgmt-storage=''
 
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
