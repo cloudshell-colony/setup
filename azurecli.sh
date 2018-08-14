@@ -26,26 +26,24 @@ SubscriptionId=$(az account show --query id -o tsv)
 #1.create resource group:
 echo "---Creating colony resource group (1/3) "$ColonyMgmtRG
 az group create -l $REGION -n $ColonyMgmtRG
-
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
 if [ "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
         echo "Resource group $ColonyMgmtRG exists"
+        
+        #2.Create the storage account:
+        echo "---Creating storage account (2/3)"$StorageName
+        az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS --tags colony-mgmt-storage=''
+
+        #3.Create mongo API cosmos db:
+        echo "---Creating cosmos DB (3/3)"$CosmosDbName
+        az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
+
+        echo -e "\n\n\n-------------------------------------------------------------------------"
+        echo -e "Copy the text below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG"
+        echo -e "-------------------------------------------------------------------------\n\n"
+else
+        echo -e "Failed creating resource group"
 fi
-
-#2.Create the storage account:
-echo "---Creating storage account (2/3)"$StorageName
-az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS --tags colony-mgmt-storage=''
-
-#3.Create mongo API cosmos db:
-echo "---Creating cosmos DB (3/3)"$CosmosDbName
-az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
-
-
-
-
-echo -e "\n\n\n-------------------------------------------------------------------------"
-echo -e "Copy the token below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG"
-echo -e "-------------------------------------------------------------------------\n\n"
 
 echo "Done"
