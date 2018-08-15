@@ -2,8 +2,9 @@
 
 #chose subscription
 subs=az account list -o json | jq -r .[].id
-for i in "${!subs[@]};" do
-  printf '${subs[%s]}=%s\n' "$i" "${subs[i]}"
+
+for i in $( subs ); do
+            echo item: $i
 done
 
 exit 1
