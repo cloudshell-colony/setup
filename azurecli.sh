@@ -61,7 +61,6 @@ echo "---Creating CosmosDB (3/3) "$CosmosDbNames
 az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
 
 echo "---Verifing CosmosDB exists "$CosmosDbName 
-
 #if storage account name is available it means that it was not created
 if [ ! "$(az cosmosdb check-name-exists -n $CosmosDbName)" = "true" ]; then
         echo -e "Error storage CosmosDB does not exists" 
