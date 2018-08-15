@@ -50,21 +50,21 @@ az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Stan
 echo "---Verifing storage account exists "$StorageName 
 
 #if storage account name is available it means that it was not created
-if [ ! "$(az storage account check-name -n $StorageName -o json | jq -r .nameAvailable)" = "false" ]; then
+if [  "$(az storage account check-name -n $StorageName -o json | jq -r .nameAvailable)" = "false" ]; then
         echo -e "Error storage account does not exists" 
         exit 1
 fi
 
 
 #3.Create mongo API cosmos db:
-echo "---Creating cosmos DB (3/3) "$CosmosDbNames
+echo "---Creating CosmosDB (3/3) "$CosmosDbNames
 az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
 
 echo "---Verifing CosmosDB exists "$CosmosDbName 
 
 #if storage account name is available it means that it was not created
-if [  "$(az cosmosdb check-name-exists -n $CosmosDbName)" = "true" ]; then
-        echo -e "Error storage account does not exists" 
+if [ ! "$(az cosmosdb check-name-exists -n $CosmosDbName)" = "true" ]; then
+        echo -e "Error storage CosmosDB does not exists" 
         exit 1
 fi
 
