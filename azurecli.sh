@@ -1,7 +1,7 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 echo -e "Preparing integration parameters"
-
+exit 1
 #creting a random key
 COLONY_RANDOM=$(date +%s | sha256sum | base64 | head -c 12;echo)$(echo $RANDOM)
 COLONY_RANDOM="$(echo $COLONY_RANDOM | tr '[A-Z]' '[a-z]')"
@@ -39,22 +39,32 @@ echo "---Creating colony resource group (1/3) "$ColonyMgmtRG
 az group create -l $REGION -n $ColonyMgmtRG
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
-if [ "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
-        echo "Resource group $ColonyMgmtRG exists"
-        
-        #2.Create the storage account:
-        echo "---Creating storage account (2/3)"$StorageName
-        az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS --tags colony-mgmt-storage=''
-
-        #3.Create mongo API cosmos db:
-        echo "---Creating cosmos DB (3/3)"$CosmosDbName
-        az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
-
-        echo -e "\n\n\n-------------------------------------------------------------------------"
-        echo -e "Copy the text below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG"
-        echo -e "-------------------------------------------------------------------------\n\n"
-else
-        echo -e "Failed creating resource group"
+if [ "$(az group exists -n $ColonyMgmtRG)" = "false" ]; then
+        echo -e "Error resource group does not exists" 
+        exit 1
 fi
+
+#2.Create the storage account:
+echo "---Creating storage account (2/3) "$StorageName
+az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS  --kind StorageV2 --tags colony-mgmt-storage=''
+
+echo "---Verifing Storage account group exists "$StorageName 
+
+#if storage account name is available it means that it was not created
+if [ "$(az storage account check-name -n $StorageName -o json | jq -r .nameAvailable)" = "true" ]; then
+        echo -e "Error storage account does not exists" 
+        exit 1
+fi
+
+
+
+
+#3.Create mongo API cosmos db:
+echo "---Creating cosmos DB (3/3) "$CosmosDbName
+az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
+
+echo -e "\n\n\n-------------------------------------------------------------------------"
+echo -e "Copy the text below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG"
+echo -e "-------------------------------------------------------------------------\n\n"
 
 echo "Done"
