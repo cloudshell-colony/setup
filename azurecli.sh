@@ -1,5 +1,14 @@
 ﻿#!/bin/bash
 
+#chose subscription
+subs=az account list -o json | jq -r .[].id
+for i in "${!subs[@]};" do
+  printf '${subs[%s]}=%s\n' "$i" "${subs[i]}"
+done
+
+exit 1
+
+
 echo -e "Preparing integration parameters"
 
 #creting a random key
@@ -33,6 +42,9 @@ fi
 #az ad app update --id $AppId --required-resource-accesses role.json
 #rm role.json
 #echo -e "\n\nApplication Name = $AppName \nApplication ID = $AppId \nApplication Key = $AppKey \nTenant ID = $TenantId \nSubscription ID = $SubscriptionId"
+
+
+
 
 #1.create resource group:
 echo "---Creating colony resource group (1/3) "$ColonyMgmtRG
