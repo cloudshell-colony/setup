@@ -1,7 +1,7 @@
 ﻿#!/bin/bash
 
 echo -e "Preparing integration parameters"
-exit 1
+
 #creting a random key
 COLONY_RANDOM=$(date +%s | sha256sum | base64 | head -c 12;echo)$(echo $RANDOM)
 COLONY_RANDOM="$(echo $COLONY_RANDOM | tr '[A-Z]' '[a-z]')"
