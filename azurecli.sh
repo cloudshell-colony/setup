@@ -1,6 +1,6 @@
 ﻿#!/bin/bash
 
-#chose subscription
+#choose subscription
 subs=$(az account list -o json | jq -r .[].id)
 
 for i in $( subs ); do
