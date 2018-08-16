@@ -1,15 +1,5 @@
 ﻿#!/bin/bash
 
-#choose subscription
-subs=$(az account list -o json | jq -r .[].id)
-
-for i in $( $subs ); do
-            echo item: $i
-done
-
-exit 1
-
-
 echo -e "Preparing integration parameters"
 
 #creting a random key
@@ -44,9 +34,6 @@ fi
 #rm role.json
 #echo -e "\n\nApplication Name = $AppName \nApplication ID = $AppId \nApplication Key = $AppKey \nTenant ID = $TenantId \nSubscription ID = $SubscriptionId"
 
-
-
-
 #1.create resource group:
 echo "---Creating colony resource group (1/3) "$ColonyMgmtRG
 az group create -l $REGION -n $ColonyMgmtRG
@@ -79,7 +66,6 @@ if [ ! "$(az cosmosdb check-name-exists -n $CosmosDbName)" = "true" ]; then
         echo -e "Error storage CosmosDB does not exists" 
         exit 1
 fi
-
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo -e "Copy the text below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG"

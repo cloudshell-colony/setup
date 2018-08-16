@@ -1,0 +1,28 @@
+[
+  {
+    "cloudName": "AzureCloud",
+    "id": "b9f0be86-aaf9-4030-a6e3-e89062c6d671",
+    "isDefault": true,
+    "name": "Visual Studio Enterprise",
+    "state": "Enabled",
+    "tenantId": "6cf5a7bf-5c86-4ddc-9245-eed561d89c24",
+    "user": {
+      "cloudShellID": true,
+      "name": "live.com#gil.g@qualisystems.com",
+      "type": "user"
+    }
+  },
+  {
+    "cloudName": "AzureCloud",
+    "id": "b9f0be86-aaf9-4030-a6e3-e89062c6d672",
+    "isDefault": true,
+    "name": "Visual Studio Enterprise",
+    "state": "Enabled",
+    "tenantId": "6cf5a7bf-5c86-4ddc-9245-eed561d89c24",
+    "user": {
+      "cloudShellID": true,
+      "name": "live.com#gil.g@qualisystems.com",
+      "type": "user"
+    }
+  }
+]
