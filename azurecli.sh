@@ -14,6 +14,9 @@ CosmosDbName=$(echo ""$ColonyMgmtRG"-sandbox-db")
 AppKey=$(openssl rand -base64 32)
 TenantId=$(az account show --query tenantId -o tsv)
 SubscriptionId=$(az account show --query id -o tsv)
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
 
 REGION="westeurope"
 if [ ! -z "$1" ]
@@ -36,7 +39,7 @@ fi
 #echo -e "\n\nApplication Name = $AppName \nApplication ID = $AppId \nApplication Key = $AppKey \nTenant ID = $TenantId \nSubscription ID = $SubscriptionId"
 
 #1.create resource group:
-echo "---Creating colony resource group (1/3) "$ColonyMgmtRG
+echo "${GREEN}---Creating colony resource group (1/3) "$ColonyMgmtRG
 az group create -l $REGION -n $ColonyMgmtRG
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
@@ -46,7 +49,7 @@ if [ ! "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
 fi
 
 #2.Create the storage account:
-echo "---Creating storage account (2/3) "$StorageName
+echo "${GREEN}---Creating storage account (2/3) "$StorageName
 az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS  --kind StorageV2 --tags colony-mgmt-storage=''
 echo "---Verifing storage account exists "$StorageName 
 
@@ -58,7 +61,7 @@ fi
 
 
 #3.Create mongo API cosmos db:
-echo "---Creating CosmosDB (3/3) "$CosmosDbNames
+echo "${GREEN}---Creating CosmosDB (3/3) "$CosmosDbNames
 az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
 
 echo "---Verifing CosmosDB exists "$CosmosDbName 
