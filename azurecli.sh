@@ -14,6 +14,7 @@ CosmosDbName=$(echo ""$ColonyMgmtRG"-sandbox-db")
 AppKey=$(openssl rand -base64 32)
 TenantId=$(az account show --query tenantId -o tsv)
 SubscriptionId=$(az account show --query id -o tsv)
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
@@ -21,8 +22,8 @@ NC='\033[0m' # No Color
 REGION="westeurope"
 if [ ! -z "$1" ]
 then
-      echo "Resources will be created udnder $1 region"
-      REGION=$1      
+      echo "Resources will be created under ${GREEN}$1${NC}region"
+      REGION=$1
 fi
 
 #cho -e "creating AD application for CloudShell Colony"
