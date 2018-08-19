@@ -5,6 +5,7 @@ echo -e "Preparing integration parameters"
 #creting a random key
 COLONY_RANDOM=$(date +%s | sha256sum | base64 | head -c 12;echo)$(echo $RANDOM)
 COLONY_RANDOM="$(echo $COLONY_RANDOM | tr '[A-Z]' '[a-z]')"
+COLONY_RANDOM="$(echo $(cat /proc/sys/kernel/random/uuid))"
 
 AppName=$(echo "COLONY"$COLONY_RANDOM)
 ColonyMgmtRG=$(echo "colony"$COLONY_RANDOM)
@@ -17,22 +18,22 @@ SubscriptionId=$(az account show --query id -o tsv)
 REGION="westeurope"
 if [ ! -z "$1" ]
 then
-      echo "will use $1 region"
+      echo "Resources will be created udnder $1 region"
       REGION=$1      
 fi
 
-echo -e "creating AD application for CloudShell Colony"
-az ad sp create-for-rbac -n $AppName --password $AppKey
-AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
+#cho -e "creating AD application for CloudShell Colony"
+#z ad sp create-for-rbac -n $AppName --password $AppKey
+#ppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
  
-echo -e "Configuring access to Azure API"
-bash -c "cat >> role.json" <<EOL
-[{"resourceAppId": "797f4846-ba00-4fd7-ba43-dac1f8f63013","resourceAccess":[{"id": "41094075-9dad-400e-a0bd-54e686782033", "type":"Scope"}]}]
-EOL
+#cho -e "Configuring access to Azure API"
+#ash -c "cat >> role.json" <<EOL
+#{"resourceAppId": "797f4846-ba00-4fd7-ba43-dac1f8f63013","resourceAccess":[{"id": "41094075-9dad-400e-a0bd-54e686782033", "type":"Scope"}]}]
+#OL
  
-az ad app update --id $AppId --required-resource-accesses role.json
-rm role.json
-echo -e "\n\nApplication Name = $AppName \nApplication ID = $AppId \nApplication Key = $AppKey \nTenant ID = $TenantId \nSubscription ID = $SubscriptionId"
+#az ad app update --id $AppId --required-resource-accesses role.json
+#rm role.json
+#echo -e "\n\nApplication Name = $AppName \nApplication ID = $AppId \nApplication Key = $AppKey \nTenant ID = $TenantId \nSubscription ID = $SubscriptionId"
 
 #1.create resource group:
 echo "---Creating colony resource group (1/3) "$ColonyMgmtRG
@@ -68,7 +69,7 @@ if [ ! "$(az cosmosdb check-name-exists -n $CosmosDbName)" = "true" ]; then
 fi
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
-echo -e "Copy the text below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG"
+echo -e "Copy the text below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$COLONY_RANDOM"
 echo -e "-------------------------------------------------------------------------\n\n"
 
 echo "Done"
