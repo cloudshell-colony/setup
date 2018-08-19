@@ -45,7 +45,7 @@ az group create -l $REGION -n $ColonyMgmtRG
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
 if [ ! "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
-        echo -e "Error resource group does not exists" 
+        echo "Error resource group does not exists" 
         exit 1
 fi
 
@@ -56,7 +56,7 @@ echo "---Verifing storage account exists "$StorageName
 
 #if storage account name is available it means that it was not created
 if [ "$(az storage account check-name -n $StorageName -o json | jq -r .nameAvailable)" = "true" ]; then
-        echo -e "Error storage account does not exists" 
+        echo "Error storage account does not exists" 
         exit 1
 fi
 
@@ -68,7 +68,7 @@ az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
 echo "---Verifing CosmosDB exists "$CosmosDbName 
 #if storage account name is available it means that it was not created
 if [ ! "$(az cosmosdb check-name-exists -n $CosmosDbName)" = "true" ]; then
-        echo -e "Error storage CosmosDB does not exists" 
+        echo "Error storage CosmosDB does not exists" 
         exit 1
 fi
 
