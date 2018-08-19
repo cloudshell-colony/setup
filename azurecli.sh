@@ -50,7 +50,7 @@ if [ ! "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
 fi
 
 #2.Create the storage account:
-echo -e "${GREEN}---Creating storage account (2/3) "$StorageName
+echo -e "$GREEN---Creating storage account (2/3) "$StorageName
 az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS  --kind StorageV2 --tags colony-mgmt-storage=''
 echo "---Verifing storage account exists "$StorageName 
 
