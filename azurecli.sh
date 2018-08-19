@@ -5,9 +5,8 @@ echo -e "Preparing integration parameters"
 #creting a random key
 COLONY_RANDOM=$(date +%s | sha256sum | base64 | head -c 12;echo)$(echo $RANDOM)
 COLONY_RANDOM="$(echo $COLONY_RANDOM | tr '[A-Z]' '[a-z]')"
-COLONY_RANDOM="$(echo $(cat /proc/sys/kernel/random/uuid))"
+AppName=$(echo "COLONY-"$COLONY_RANDOM)
 
-AppName=$(echo "COLONY"$COLONY_RANDOM)
 ColonyMgmtRG=$(echo "colony"$COLONY_RANDOM)
 StorageName=$(echo "colony"$COLONY_RANDOM)
 CosmosDbName=$(echo ""$ColonyMgmtRG"-sandbox-db")
@@ -22,7 +21,7 @@ NC='\033[0m' # No Color
 REGION="westeurope"
 if [ ! -z "$1" ]
 then
-      echo -e "Resources will be created under ${GREEN}$1${NC}region"
+      echo -e "Resources will be created under $GREEN$1$NC region"
       REGION=$1
 fi
 
@@ -40,7 +39,7 @@ fi
 #echo -e "\n\nApplication Name = $AppName \nApplication ID = $AppId \nApplication Key = $AppKey \nTenant ID = $TenantId \nSubscription ID = $SubscriptionId"
 
 #1.create resource group:
-echo -e "${GREEN}---Creating colony resource group (1/3) "$ColonyMgmtRG
+echo -e "$GREEN---Creating colony resource group (1/3) "$ColonyMgmtRG"$NC"
 az group create -l $REGION -n $ColonyMgmtRG
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
@@ -73,7 +72,7 @@ if [ ! "$(az cosmosdb check-name-exists -n $CosmosDbName)" = "true" ]; then
 fi
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
-echo -e "Copy the text below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$COLONY_RANDOM"
+echo -e "Copy the text below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG"
 echo -e "-------------------------------------------------------------------------\n\n"
 
 echo "Done"
