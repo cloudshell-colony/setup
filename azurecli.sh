@@ -51,7 +51,7 @@ az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Stan
 echo "---Verifing storage account exists "$StorageName 
 
 #if storage account name is available it means that it was not created
-if [ ! "$(az storage account check-name -n $StorageName -o json | jq -r .nameAvailable)" = "false" ]; then
+if [ "$(az storage account check-name -n $StorageName -o json | jq -r .nameAvailable)" = "true" ]; then
         echo -e "Error storage account does not exists" 
         exit 1
 fi
