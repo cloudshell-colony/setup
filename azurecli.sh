@@ -39,7 +39,7 @@ fi
 #echo -e "\n\nApplication Name = $AppName \nApplication ID = $AppId \nApplication Key = $AppKey \nTenant ID = $TenantId \nSubscription ID = $SubscriptionId"
 
 #1.create resource group:
-echo -e "$GREEN---Creating colony resource group (1/3) "$ColonyMgmtRG"$NC"
+echo -e "$GREEN---Creating colony resource group (1/3) "$ColonyMgmtRG$NC
 az group create -l $REGION -n $ColonyMgmtRG
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
@@ -49,7 +49,7 @@ if [ ! "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
 fi
 
 #2.Create the storage account:
-echo -e "$GREEN---Creating storage account (2/3) "$StorageName
+echo -e "$GREEN---Creating storage account (2/3) "$StorageName$NC
 az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS  --kind StorageV2 --tags colony-mgmt-storage=''
 echo "---Verifing storage account exists "$StorageName 
 
@@ -61,7 +61,7 @@ fi
 
 
 #3.Create mongo API cosmos db:
-echo -e "${GREEN}---Creating CosmosDB (3/3) "$CosmosDbNames
+echo -e "${GREEN}---Creating CosmosDB (3/3) "$CosmosDbNames$NC
 az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB
 
 echo "---Verifing CosmosDB exists "$CosmosDbName 
