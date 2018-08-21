@@ -25,18 +25,18 @@ then
       REGION=$1
 fi
 
-#cho -e "creating AD application for CloudShell Colony"
-#z ad sp create-for-rbac -n $AppName --password $AppKey
-#ppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
+cho -e "creating AD application for CloudShell Colony"
+z ad sp create-for-rbac -n $AppName --password $AppKey
+ppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
  
-#cho -e "Configuring access to Azure API"
-#ash -c "cat >> role.json" <<EOL
-#{"resourceAppId": "797f4846-ba00-4fd7-ba43-dac1f8f63013","resourceAccess":[{"id": "41094075-9dad-400e-a0bd-54e686782033", "type":"Scope"}]}]
-#OL
+cho -e "Configuring access to Azure API"
+ash -c "cat >> role.json" <<EOL
+{"resourceAppId": "797f4846-ba00-4fd7-ba43-dac1f8f63013","resourceAccess":[{"id": "41094075-9dad-400e-a0bd-54e686782033", "type":"Scope"}]}]
+OL
  
-#az ad app update --id $AppId --required-resource-accesses role.json
-#rm role.json
-#echo -e "\n\nApplication Name = $AppName \nApplication ID = $AppId \nApplication Key = $AppKey \nTenant ID = $TenantId \nSubscription ID = $SubscriptionId"
+az ad app update --id $AppId --required-resource-accesses role.json
+rm role.json
+echo -e "\n\nApplication Name = $AppName \nApplication ID = $AppId \nApplication Key = $AppKey \nTenant ID = $TenantId \nSubscription ID = $SubscriptionId"
 
 #1.create resource group:
 echo -e "$GREEN---Creating colony resource group (1/3) "$ColonyMgmtRG$NC
