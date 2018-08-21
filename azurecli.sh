@@ -72,7 +72,7 @@ if [ ! "$(az cosmosdb check-name-exists -n $CosmosDbName)" = "true" ]; then
 fi
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
-echo -e "Copy the text below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG" > azure_colony_setup.txt
+echo -e "Copy the text below and paste it into Colony's Azure authentication page \n\n$AppId,$AppKey,$TenantId,$SubscriptionId,$ColonyMgmtRG" > colony_setup_data.txt
 echo -e "-------------------------------------------------------------------------\n\n"
 
 
