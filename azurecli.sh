@@ -25,14 +25,14 @@ then
       REGION=$1
 fi
 
-cho -e "creating AD application for CloudShell Colony"
-z ad sp create-for-rbac -n $AppName --password $AppKey
+echo -e "creating AD application for CloudShell Colony"
+az ad sp create-for-rbac -n $AppName --password $AppKey
 AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
  
-cho -e "Configuring access to Azure API"
-ash -c "cat >> role.json" <<EOL
-{"resourceAppId": "797f4846-ba00-4fd7-ba43-dac1f8f63013","resourceAccess":[{"id": "41094075-9dad-400e-a0bd-54e686782033", "type":"Scope"}]}]
-OL
+echo -e "Configuring access to Azure API"
+bash -c "cat >> role.json" <<EOL
+[{"resourceAppId": "797f4846-ba00-4fd7-ba43-dac1f8f63013","resourceAccess":[{"id": "41094075-9dad-400e-a0bd-54e686782033", "type":"Scope"}]}]
+EOL
  
 az ad app update --id $AppId --required-resource-accesses role.json
 rm role.json
