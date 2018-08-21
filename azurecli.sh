@@ -21,11 +21,11 @@ NC='\033[0m' # No Color
 REGION="westeurope"
 if [ ! -z "$1" ]
 then
-      echo -e "Resources will be created under $GREEN$1$NC region"
       REGION=$1
 fi
-
-echo -e "creating AD application for CloudShell Colony"
+echo -e "Resources will be created under $GREEN$1$NC region"
+a
+echo -e "Creating AD application for CloudShell Colony"
 az ad sp create-for-rbac -n $AppName --password $AppKey
 AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
  
