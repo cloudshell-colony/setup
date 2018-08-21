@@ -27,7 +27,7 @@ fi
 
 cho -e "creating AD application for CloudShell Colony"
 z ad sp create-for-rbac -n $AppName --password $AppKey
-ppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
+AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
  
 cho -e "Configuring access to Azure API"
 ash -c "cat >> role.json" <<EOL
