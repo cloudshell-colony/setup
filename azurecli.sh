@@ -7,8 +7,8 @@ COLONY_RANDOM=$(date +%s | sha256sum | base64 | head -c 12;echo)$(echo $RANDOM)
 COLONY_RANDOM="$(echo $COLONY_RANDOM | tr '[A-Z]' '[a-z]')"
 AppName=$(echo "COLONY-"$COLONY_RANDOM)
 
-ColonyMgmtRG=$(echo "colony-"$COLONY_RANDOM)
-StorageName=$(echo "colony-"$COLONY_RANDOM)
+ColonyMgmtRG=$(echo "colony"$COLONY_RANDOM)
+StorageName=$(echo "colony"$COLONY_RANDOM)
 CosmosDbName=$(echo ""$ColonyMgmtRG"-sandbox-db")
 AppKey=$(openssl rand -base64 32)
 TenantId=$(az account show --query tenantId -o tsv)
