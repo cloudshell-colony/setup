@@ -8,7 +8,7 @@
   "resources": [
   ],
   "outputs": {
-    "outz"{
+    "outz":{
     
       "type": "string",
       "value": "[resourceId('Microsoft.Network/dnszones', parameters('dnszones_1m7psesksp003.sandbox.com_name'))]"
