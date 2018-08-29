@@ -73,7 +73,7 @@ fi
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo "Copy the text below and paste it into Colony's Azure authentication page"
-echo -e "appId=$AppId,\nappKey=$AppKey,\ntenantId=$TenantId,\nsubscriptionId=$SubscriptionId,\ncolonyResourceGroup=$ColonyMgmtRG"
+echo -e "appId:$AppId,\nappKey:$AppKey,\ntenantId:$TenantId,\nsubscriptionId:$SubscriptionId,\ncolonyResourceGroup:$ColonyMgmtRG"
 echo -e "-------------------------------------------------------------------------\n\n"
-echo "appId=$AppId,appKey=$AppKey,tenantId=$TenantId,subscriptionId=$SubscriptionId,colonyResourceGroup=$ColonyMgmtRG" > colony_data.txt
+echo "appId:$AppId,appKey:$AppKey,tenantId:$TenantId,subscriptionId:$SubscriptionId,colonyResourceGroup:$ColonyMgmtRG" > colony_data.txt
 echo "Done"
