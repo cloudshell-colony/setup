@@ -23,8 +23,8 @@ if [ ! -z "$1" ]
 then
       REGION=$1
 fi
-echo -e "Resources will be created under $GREEN$1$NC region"
-a
+echo -e "Resources will be created under $GREEN$REGION$NC region"
+
 echo -e "Creating AD application for CloudShell Colony"
 az ad sp create-for-rbac -n $AppName --password $AppKey
 AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
@@ -73,7 +73,7 @@ fi
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo "Copy the text below and paste it into Colony's Azure authentication page"
-echo -e "appId=$AppId,appKey=$AppKey,tenantId=$TenantId,subscriptionId=$SubscriptionId,colonyResourceGroup=$ColonyMgmtRG"
+echo -e "appId=$AppId,\nappKey=$AppKey,\ntenantId=$TenantId,\nsubscriptionId=$SubscriptionId,\ncolonyResourceGroup=$ColonyMgmtRG"
 echo -e "-------------------------------------------------------------------------\n\n"
 echo "appId=$AppId,appKey=$AppKey,tenantId=$TenantId,subscriptionId=$SubscriptionId,colonyResourceGroup=$ColonyMgmtRG" > colony_data.txt
 echo "Done"
