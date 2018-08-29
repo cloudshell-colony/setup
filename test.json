@@ -11,7 +11,7 @@
     "outz":{
     
       "type": "string",
-      "value": "[resourceId('Microsoft.Network/dnszones', parameters('dnszones_1m7psesksp003.sandbox.com_name'))]"
+      "value": "[resourceId('Microsoft.Network/dnszones', parameters('1m7psesksp003.sandbox.com.sandbox.com_name'))]"
   }
 }
 }
