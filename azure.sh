@@ -54,8 +54,8 @@ TenantId=$(az account show --query tenantId -o tsv)
 
 
 echo -e "Creating AD application for CloudShell Colony"
-az ad sp create-for-rbac -n $AppName --password $AppKey
-AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
+az ad sp create-for-rbac -n $AppName --password $AppKey --subscribtion $SubscriptionId
+AppId=$(az ad app list --subscribtion $SubscriptionId --display-name $AppName | jq '.[0].appId' | tr -d \")
  
 echo -e "Configuring access to Azure API"
 bash -c "cat >> role.json" <<EOL
