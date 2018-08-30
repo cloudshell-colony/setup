@@ -15,24 +15,36 @@ END=$length-1
 i=0
 declare -i subscription_number=0
 
-echo "Please type subscription number:#"
-while [[ $i -le $END ]]
-do
-	# prints subscription name and id
-	echo "$((i+1))" $(jq -n "$x" | jq .["$i"].name )  $(jq -n "$x" | jq .["$i"].id )
-	((i++))
-done
+if [ "$length" -eq 0 ]
+then
+        echo -e "${RED}Error no subscription found${NC}"
+        exit 1
+fi
 
-read -p  "Please enter number between 1 to $length: " subscription_number
+if [ "$length" -eq 1 ]
+then
+        subscription_number=1
+else 
+        echo "Please type subscription number:#"
+        while [[ $i -le $END ]]
+        do
+                # prints subscription name and id
+                echo "$((i+1))" $(jq -n "$x" | jq .["$i"].name )  $(jq -n "$x" | jq .["$i"].id )
+                ((i++))
+        done
 
-while [  $subscription_number -lt 1 -o $subscription_number -gt $length ]
-do	
-	read -p "Please enter number between 1 to $length: " subscription_number
-done
+        read -p  "Please enter number between 1 to $length: " subscription_number
+
+        while [  $subscription_number -lt 1 -o $subscription_number -gt $length ]
+        do	
+                read -p "Please enter number between 1 to $length: " subscription_number
+        done
+fi
+
 SubscriptionId=$(jq -n "$x" | jq .["$((subscription_number-1))"].id -r)
 
 echo -e "Chosen subscription:" $GREEN$(jq -n "$x" | jq .["$((subscription_number-1))"].name )  $SubscriptionId$NC
-
+exit 0
 #========================================================================================
 REGION="westeurope"
 if [ ! -z "$1" ]
@@ -54,8 +66,8 @@ TenantId=$(az account show --query tenantId -o tsv)
 
 
 echo -e "Creating AD application for CloudShell Colony"
-az ad sp create-for-rbac -n $AppName --password $AppKey --subscribtion $SubscriptionId
-AppId=$(az ad app list --subscribtion $SubscriptionId --display-name $AppName | jq '.[0].appId' | tr -d \")
+az ad sp create-for-rbac -n $AppName --password $AppKey --subscription $SubscriptionId
+AppId=$(az ad app list --subscription $SubscriptionId --display-name $AppName | jq '.[0].appId' | tr -d \")
  
 echo -e "Configuring access to Azure API"
 bash -c "cat >> role.json" <<EOL
