@@ -34,6 +34,14 @@ SubscriptionId=$(jq -n "$x" | jq .["$((subscription_number-1))"].id -r)
 echo -e "Chosen subscription:" $GREEN$(jq -n "$x" | jq .["$((subscription_number-1))"].name )  $SubscriptionId$NC
 
 #========================================================================================
+REGION="westeurope"
+if [ ! -z "$1" ]
+then
+      REGION=$1
+fi
+
+echo -e "All resources will be created under $GREEN$REGION$NC region"
+
 #creting a random key
 COLONY_RANDOM=$(date +%s | sha256sum | base64 | head -c 12;echo)$(echo $RANDOM)
 COLONY_RANDOM="$(echo $COLONY_RANDOM | tr '[A-Z]' '[a-z]')"
@@ -44,13 +52,7 @@ CosmosDbName=$(echo ""$ColonyMgmtRG"-sandbox-db")
 AppKey=$(openssl rand -base64 32)
 TenantId=$(az account show --query tenantId -o tsv)
 
-REGION="westeurope"
-if [ ! -z "$1" ]
-then
-      REGION=$1
-fi
 
-echo -e "All resources will be created under $GREEN$REGION$NC region"
 echo -e "Creating AD application for CloudShell Colony"
 az ad sp create-for-rbac -n $AppName --password $AppKey
 AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
