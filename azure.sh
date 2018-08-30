@@ -44,7 +44,7 @@ fi
 SubscriptionId=$(jq -n "$x" | jq .["$((subscription_number-1))"].id -r)
 
 echo -e "Chosen subscription:" $GREEN$(jq -n "$x" | jq .["$((subscription_number-1))"].name )  $SubscriptionId$NC
-exit 0
+
 #========================================================================================
 REGION="westeurope"
 if [ ! -z "$1" ]
