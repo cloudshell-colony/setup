@@ -5,12 +5,22 @@ export AZURE_HTTP_USER_AGENT='pid-0b87316f-9d3a-427e-88cf-399fc4100b33'
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
+REGION="westeurope"
+
+if [ ! -z "$1" ]
+then
+      REGION=$1
+fi
 
 echo -e "\n\n   ___ _    ___  _   _ ___  ___ _  _ ___ _    _        ___ ___  _    ___  _  ___   __"
 echo -e "  / __| |  / _ \| | | |   \/ __| || | __| |  | |  ___ / __/ _ \| |  / _ \| \| \ \ / /"
 echo -e " | (__| |_| (_) | |_| | |) \__ \ __ | _|| |__| |_|___| (_| (_) | |_| (_) | .   \ V / "
 echo -e "  \___|____\___/ \___/|___/|___/_||_|___|____|____|   \___\___/|____\___/|_|\_| |_|  \n\n\n"
 
+
+echo -e "Please wait while we setup the integration with your Azure account."
+echo -e "This script grants Cloud Shell Colony permissions to your account and\ncreates a small management layer that will keep your data safe."
+echo -e "For more information visit: https://colonysupport.quali.com/hc/en-us/articles/360008858093-Granting-access-to-your-Azure-account"
 #========================================================================================
 x=$(az account list)
 length=$(jq -n "$x" | jq '. | length')
@@ -46,22 +56,19 @@ fi
 
 SubscriptionId=$(jq -n "$x" | jq .["$((subscription_number-1))"].id -r)
 
-echo -e "Chosen subscription:" $GREEN$(jq -n "$x" | jq .["$((subscription_number-1))"].name )  $SubscriptionId$NC
+echo -e "Running with settings:"
+echo -e "Subscription:" $GREEN$(jq -n "$x" | jq .["$((subscription_number-1))"].name )  $SubscriptionId$NC
+echo -e "Region $GREEN$REGION$NC"
 
 #========================================================================================
-REGION="westeurope"
-if [ ! -z "$1" ]
-then
-      REGION=$1
-fi
 
-echo -e "All resources will be created under $GREEN$REGION$NC region"
+
 
 #creting a random key
 COLONY_RANDOM=$(date +%s | sha256sum | base64 | head -c 12;echo)$(echo $RANDOM)
 COLONY_RANDOM="$(echo $COLONY_RANDOM | tr '[A-Z]' '[a-z]')"
 AppName=$(echo "COLONY-"$COLONY_RANDOM)
-ColonyMgmtRG=$(echo "colony"$COLONY_RANDOM)
+ColonyMgmtRG=$(echo "colony-"$COLONY_RANDOM)
 StorageName=$(echo "colony"$COLONY_RANDOM)
 CosmosDbName=$(echo ""$ColonyMgmtRG"-sandbox-db")
 AppKey=$(openssl rand -base64 32)
@@ -85,7 +92,7 @@ echo -e "\n\nApplication Name : $AppName \nApplication ID : $AppId \nApplication
 
 
 #1.create resource group:
-echo -e "$GREEN---Creating colony resource group (1/3) "$ColonyMgmtRG$NC
+echo -e "$GREEN---Creating resource group (1/3) "$ColonyMgmtRG$NC
 az group create -l $REGION -n $ColonyMgmtRG --subscription $SubscriptionId --tags colony-mgmt-group=''
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
@@ -106,7 +113,7 @@ if [ "$(az storage account check-name -n $StorageName -o json | jq -r .nameAvail
 fi
 
 #3.Create mongo API cosmos db:
-echo -e "${GREEN}---Creating CosmosDB ${RED}This step may take a few minutes ${GREEN}(3/3)${NC} "$CosmosDbNames$NC
+echo -e "${GREEN}---Creating CosmosDB ${CosmosDbName}\n${RED}This step may take a few minutes, please wait until a token is generated ${GREEN}(3/3)${NC}"
 az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB --subscription $SubscriptionId --tags colony-mgmt-cosmosdb=''
 
 echo "---Verifing CosmosDB exists "$CosmosDbName 
@@ -121,7 +128,7 @@ az lock create -g $ColonyMgmtRG -n LockGroup --lock-type CanNotDelete --subscrip
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo "Copy the text below and paste it into Colony's Azure authentication page"
-echo -e "${GREEN}appId:$AppId,\nappKey:$AppKey,\ntenantId:$TenantId,\nsubscriptionId:$SubscriptionId,\ncolonyResourceGroup:$ColonyMgmtRG${NC}"
+echo -e "${GREEN}appId:$AppId,appKey:$AppKey,tenantId:$TenantId,subscriptionId:$SubscriptionId,colonyResourceGroup:$ColonyMgmtRG${NC}"
 echo -e "-------------------------------------------------------------------------\n\n"
 
 
