@@ -18,7 +18,7 @@ echo -e " | (__| |_| (_) | |_| | |) \__ \ __ | _|| |__| |_|___| (_| (_) | |_| (_
 echo -e "  \___|____\___/ \___/|___/|___/_||_|___|____|____|   \___\___/|____\___/|_|\_| |_|  \n\n\n"
 
 
-echo -e "Please wait while we setup the integration with your Azure account."
+echo -e "$GREEN Please wait while we setup the integration with your Azure account. $NC \n"
 echo -e "This script grants Cloud Shell Colony permissions to your account and\ncreates a small management layer that will keep your data safe."
 echo -e "For more information visit: https://colonysupport.quali.com/hc/en-us/articles/360008858093-Granting-access-to-your-Azure-account"
 #========================================================================================
