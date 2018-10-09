@@ -1,7 +1,11 @@
 #!/bin/bash
-
 export AZURE_HTTP_USER_AGENT='pid-0b87316f-9d3a-427e-88cf-399fc4100b33'
 
+function quit_on_err {
+	echo $1			  			  
+	exit 
+}
+		   
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
@@ -76,9 +80,11 @@ TenantId=$(az account show --query tenantId -o tsv)
 
 
 echo -e "Creating AD application for CloudShell Colony"
-az ad sp create-for-rbac -n $AppName --password $AppKey --subscription $SubscriptionId
+az ad sp create-for-rbac -n $AppName --password $AppKey --subscription $SubscriptionId ||  quit_on_err "The user that runs the script should be an Owner."
+
+
 AppId=$(az ad app list --subscription $SubscriptionId --display-name $AppName | jq '.[0].appId' | tr -d \")
- 
+
 echo -e "Configuring access to Azure API"
 bash -c "cat >> role.json" <<EOL
 [{"resourceAppId": "797f4846-ba00-4fd7-ba43-dac1f8f63013","resourceAccess":[{"id": "41094075-9dad-400e-a0bd-54e686782033", "type":"Scope"}]}]
