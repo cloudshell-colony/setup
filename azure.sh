@@ -27,6 +27,7 @@ echo -e "This script grants Cloud Shell Colony permissions to your account and\n
 echo -e "For more information visit: https://colonysupport.quali.com/hc/en-us/articles/360008858093-Granting-access-to-your-Azure-account\n\n"
 #========================================================================================
 x=$(az account list)
+accountname=$(az account show |jq -r .user.name)
 length=$(jq -n "$x" | jq '. | length')
 END=$length-1
 i=0
@@ -99,7 +100,7 @@ echo -e "\n\nApplication Name : $AppName \nApplication ID : $AppId \nApplication
 
 #1.create resource group:
 echo -e "$GREEN---Creating resource group (1/3) "$ColonyMgmtRG$NC
-az group create -l $REGION -n $ColonyMgmtRG --subscription $SubscriptionId --tags colony-mgmt-group=''
+az group create -l $REGION -n $ColonyMgmtRG --subscription $SubscriptionId --tags colony-mgmt-group='' owner=$accountname
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
 if [ ! "$(az group exists -n $ColonyMgmtRG --subscription $SubscriptionId)" = "true" ]; then
