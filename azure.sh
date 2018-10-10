@@ -108,6 +108,9 @@ if [ ! "$(az group exists -n $ColonyMgmtRG --subscription $SubscriptionId)" = "t
         exit 1
 fi
 
+echo "---Locking Resource Group "$ColonyMgmtRG 
+az lock create -g $ColonyMgmtRG -n LockGroup --lock-type CanNotDelete --subscription $SubscriptionId
+
 #2.Create the storage account:
 echo -e "$GREEN---Creating storage account (2/3) "$StorageName$NC
 az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS  --kind StorageV2 --tags colony-mgmt-storage='' --subscription $SubscriptionId
@@ -130,8 +133,6 @@ if [ ! "$(az cosmosdb check-name-exists -n $CosmosDbName)" = "true" ]; then
         exit 1
 fi
 
-echo "---Locking Resource Group "$ColonyMgmtRG 
-az lock create -g $ColonyMgmtRG -n LockGroup --lock-type CanNotDelete --subscription $SubscriptionId
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo "Copy the text below and paste it into Colony's Azure authentication page"
