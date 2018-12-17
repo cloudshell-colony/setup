@@ -81,7 +81,7 @@ TenantId=$(az account show --query tenantId -o tsv)
 
 
 echo -e "Creating AD application for CloudShell Colony"
-az ad sp create-for-rbac -n $AppName --password $AppKey --subscription $SubscriptionId ||  quit_on_err "The user that runs the script should be an Owner."
+az ad sp create-for-rbac -n $AppName --password $AppKey --years 99 --subscription $SubscriptionId ||  quit_on_err "The user that runs the script should be an Owner."
 
 
 AppId=$(az ad app list --subscription $SubscriptionId --display-name $AppName | jq '.[0].appId' | tr -d \")
