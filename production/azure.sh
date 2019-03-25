@@ -107,9 +107,6 @@ if [ ! "$(az group exists -n $ColonyMgmtRG --subscription $SubscriptionId)" = "t
         exit 1
 fi
 
-echo "---Locking Resource Group "$ColonyMgmtRG 
-az lock create -g $ColonyMgmtRG -n LockGroup --lock-type CanNotDelete --subscription $SubscriptionId
-
 #2.Create the storage account:
 echo -e "$GREEN---Creating storage account (2/2) "$StorageName$NC
 az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS  --kind StorageV2 --tags colony-mgmt-storage='' --subscription $SubscriptionId
