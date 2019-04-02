@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 export AZURE_HTTP_USER_AGENT='pid-0b87316f-9d3a-427e-88cf-399fc4100b33'
 
 function quit_on_err {
