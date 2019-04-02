@@ -2,10 +2,10 @@
 export AZURE_HTTP_USER_AGENT='pid-0b87316f-9d3a-427e-88cf-399fc4100b33'
 
 function quit_on_err {
-	echo $1			  			  
-	exit 
+    echo $1                       
+    exit 
 }
-		   
+           
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
@@ -54,7 +54,7 @@ else
         read -p  "Please enter number between 1 to $length: " subscription_number
 
         while [  $subscription_number -lt 1 -o $subscription_number -gt $length ]
-        do	
+        do  
                 read -p "Please enter number between 1 to $length: " subscription_number
         done
 fi
@@ -75,15 +75,13 @@ COLONY_RANDOM="$(echo $COLONY_RANDOM | tr '[A-Z]' '[a-z]')"
 AppName=$(echo "COLONY-"$COLONY_RANDOM)
 ColonyMgmtRG=$(echo "colony-"$COLONY_RANDOM)
 StorageName=$(echo "colony"$COLONY_RANDOM)
-CosmosDbName=$(echo ""$ColonyMgmtRG"-sandbox-db")
 AppKey=$(openssl rand -base64 32)
 TenantId=$(az account show --query tenantId -o tsv)
 
 
 echo -e "Creating AD application for CloudShell Colony"
-az ad sp create-for-rbac -n $AppName --password $AppKey --years 99 --subscription $SubscriptionId ||  quit_on_err "The user that runs the script should be an Owner."
-
-
+az ad sp create-for-rbac -n $AppName --password $AppKey --subscription $SubscriptionId ||  quit_on_err "The user that runs the script should be an Owner."
+az ad sp credential reset -n $AppName --password $AppKey --end-date '2299-12-31' --subscription $SubscriptionId 
 AppId=$(az ad app list --subscription $SubscriptionId --display-name $AppName | jq '.[0].appId' | tr -d \")
 
 echo -e "Configuring access to Azure API"
@@ -99,7 +97,7 @@ echo -e "\n\nApplication Name : $AppName \nApplication ID : $AppId \nApplication
 
 
 #1.create resource group:
-echo -e "$GREEN---Creating resource group (1/3) "$ColonyMgmtRG$NC
+echo -e "$GREEN---Creating resource group (1/2) "$ColonyMgmtRG$NC
 az group create -l $REGION -n $ColonyMgmtRG --subscription $SubscriptionId --tags colony-mgmt-group='' owner=$accountname
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
@@ -109,7 +107,7 @@ if [ ! "$(az group exists -n $ColonyMgmtRG --subscription $SubscriptionId)" = "t
 fi
 
 #2.Create the storage account:
-echo -e "$GREEN---Creating storage account (2/3) "$StorageName$NC
+echo -e "$GREEN---Creating storage account (2/2) "$StorageName$NC
 az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS  --kind StorageV2 --tags colony-mgmt-storage='' --subscription $SubscriptionId
 echo "---Verifing storage account exists "$StorageName 
 
@@ -119,17 +117,8 @@ if [ "$(az storage account check-name -n $StorageName -o json | jq -r .nameAvail
         exit 1
 fi
 
-#3.Create mongo API cosmos db:
-echo -e "${GREEN}---Creating CosmosDB ${CosmosDbName}\n${RED}This step may take a few minutes, please wait until a token is generated ${GREEN}(3/3)${NC}"
-az cosmosdb create -g $ColonyMgmtRG -n $CosmosDbName --kind MongoDB --subscription $SubscriptionId --tags colony-mgmt-cosmosdb=''
-
-echo "---Verifing CosmosDB exists "$CosmosDbName 
-#if storage account name is available it means that it was not created
-if [ ! "$(az cosmosdb check-name-exists -n $CosmosDbName)" = "true" ]; then
-        echo "Error storage CosmosDB does not exists" 
-        exit 1
-fi
-
+echo -e "$GREEN---Creating table in storage account"$NC
+az storage table create -n colonySandboxes  --account-name $StorageName
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo "Copy the text below and paste it into Colony's Azure authentication page"
