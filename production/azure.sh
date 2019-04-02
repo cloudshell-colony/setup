@@ -84,7 +84,7 @@ az ad sp create-for-rbac -n $AppName --password $AppKey --subscription $Subscrip
 read -p "Remove just a test   --- "
 az ad sp credential reset -n $AppName --password $AppKey --end-date '2299-12-31' --subscription $SubscriptionId 
 
-exit 
+
 AppId=$(az ad app list --subscription $SubscriptionId --display-name $AppName | jq '.[0].appId' | tr -d \")
 
 echo -e "Configuring access to Azure API"
