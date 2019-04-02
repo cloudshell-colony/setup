@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 export AZURE_HTTP_USER_AGENT='pid-0b87316f-9d3a-427e-88cf-399fc4100b33'
 
 function quit_on_err {
@@ -80,9 +80,11 @@ TenantId=$(az account show --query tenantId -o tsv)
 
 
 echo -e "Creating AD application for CloudShell Colony"
-az ad sp create-for-rbac -n $AppName --password $AppKey --years 99 --subscription $SubscriptionId ||  quit_on_err "The user that runs the script should be an Owner."
+az ad sp create-for-rbac -n $AppName --password $AppKey --subscription $SubscriptionId ||  quit_on_err "The user that runs the script should be an Owner."
+read -p "Remove just a test   --- "
+az ad sp credential reset -n $AppName --password $AppKey --end-date '2299-12-31' --subscription $SubscriptionId 
 
-
+exit 
 AppId=$(az ad app list --subscription $SubscriptionId --display-name $AppName | jq '.[0].appId' | tr -d \")
 
 echo -e "Configuring access to Azure API"
