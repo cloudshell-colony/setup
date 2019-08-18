@@ -1,11 +1,9 @@
 #!/bin/bash
 export AZURE_HTTP_USER_AGENT='pid-0b87316f-9d3a-427e-88cf-399fc4100b33'
 
-function quit_on_err {
-    echo $1                       
-    exit 
-}
-           
+function quit_on_err { echo $1; exit; }
+function ver { printf "%03d%03d%03d%03d" $(echo "$1" | tr '.' ' '); }          
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
@@ -60,38 +58,44 @@ else
 fi
 
 SubscriptionId=$(jq -n "$x" | jq .["$((subscription_number-1))"].id -r)
+AZ_VERSION=$(az --version | grep -Po 'azure\-cli.*\K(\d+\.\d+\.\d+)')
+
+az account set --subscription $SubscriptionId
 
 echo -e "Running with settings:"
 echo -e "Subscription:" $GREEN$(jq -n "$x" | jq .["$((subscription_number-1))"].name )  $SubscriptionId$NC
 echo -e "Region $GREEN$REGION$NC"
+echo -e "Azure-cli version: $AZ_VERSION"
 
 #========================================================================================
 
-
-
-#creting a random key
 COLONY_RANDOM=$(date +%s | sha256sum | base64 | head -c 12;echo)$(echo $RANDOM)
 COLONY_RANDOM="$(echo $COLONY_RANDOM | tr '[A-Z]' '[a-z]')"
 AppName=$(echo "COLONY-"$COLONY_RANDOM)
 ColonyMgmtRG=$(echo "colony-"$COLONY_RANDOM)
 StorageName=$(echo "colony"$COLONY_RANDOM)
-AppKey=$(openssl rand -base64 32)
 TenantId=$(az account show --query tenantId -o tsv)
 
 
 echo -e "Creating AD application for CloudShell Colony"
-az ad sp create-for-rbac -n $AppName --password $AppKey --subscription $SubscriptionId ||  quit_on_err "The user that runs the script should be an Owner."
-az ad sp credential reset -n $AppName --password $AppKey --end-date '2299-12-31' --subscription $SubscriptionId 
+if [ $(ver $AZ_VERSION) -ge $(ver 2.0.55) ]; then
+    AppKey=$(az ad sp create-for-rbac -n $AppName | jq -r '.password') ||  quit_on_err "The user that runs the script should be an Owner."
+else
+    AppKey=$(openssl rand -base64 32)
+    az ad sp create-for-rbac -n $AppName --password $AppKey $SubscriptionId ||  quit_on_err "The user that runs the script should be an Owner."
+fi
+AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
+az ad sp credential reset -n $AppName --password $AppKey --end-date '2299-12-31'
 
 
-AppId=$(az ad app list --subscription $SubscriptionId --display-name $AppName | jq '.[0].appId' | tr -d \")
+
 
 echo -e "Configuring access to Azure API"
 bash -c "cat >> role.json" <<EOL
 [{"resourceAppId": "797f4846-ba00-4fd7-ba43-dac1f8f63013","resourceAccess":[{"id": "41094075-9dad-400e-a0bd-54e686782033", "type":"Scope"}]}]
 EOL
  
-az ad app update --id $AppId --required-resource-accesses role.json --subscription $SubscriptionId
+az ad app update --id $AppId --required-resource-accesses role.json
 rm role.json
 echo -e "\n\nApplication Name : $AppName \nApplication ID : $AppId \nApplication Key : $AppKey \nTenant ID : $TenantId \nSubscription ID : $SubscriptionId"
 
@@ -100,17 +104,17 @@ echo -e "\n\nApplication Name : $AppName \nApplication ID : $AppId \nApplication
 
 #1.create resource group:
 echo -e "$GREEN---Creating resource group (1/2) "$ColonyMgmtRG$NC
-az group create -l $REGION -n $ColonyMgmtRG --subscription $SubscriptionId --tags colony-mgmt-group='' owner=$accountname
+az group create -l $REGION -n $ColonyMgmtRG --tags colony-mgmt-group='' owner=$accountname
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
-if [ ! "$(az group exists -n $ColonyMgmtRG --subscription $SubscriptionId)" = "true" ]; then
+if [ ! "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
         echo "Error resource group does not exists" 
         exit 1
 fi
 
 #2.Create the storage account:
 echo -e "$GREEN---Creating storage account (2/2) "$StorageName$NC
-az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS  --kind StorageV2 --tags colony-mgmt-storage='' --subscription $SubscriptionId
+az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS  --kind StorageV2 --tags colony-mgmt-storage=''
 echo "---Verifing storage account exists "$StorageName 
 
 #if storage account name is available it means that it was not created
