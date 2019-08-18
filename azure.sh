@@ -71,7 +71,6 @@ az account set --subscription $SubscriptionId
 echo -e "Running with settings:"
 echo -e "Subscription:" $GREEN$(jq -n "$x" | jq .["$((subscription_number-1))"].name )  $SubscriptionId$NC
 echo -e "Region $GREEN$REGION$NC"
-echo -e "Azure-cli version: $AZ_VERSION"
 
 #========================================================================================
 
