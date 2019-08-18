@@ -24,6 +24,13 @@ echo -e "$GREEN Please wait while we setup the integration with your Azure accou
 echo -e "This script grants Cloud Shell Colony permissions to your account and\ncreates a small management layer that will keep your data safe."
 echo -e "For more information visit: https://colonysupport.quali.com/hc/en-us/articles/360008858093-Granting-access-to-your-Azure-account\n\n"
 #========================================================================================
+
+AZ_VERSION=$(az --version | grep -Po 'azure\-cli.*\K(\d+\.\d+\.\d+)')
+if [ $(ver $AZ_VERSION) -lt $(ver 2.0.69) ]; then
+    echo -e "${RED}Unsupported azure-cli version of $AZ_VERSION. Please update to version 2.0.68 or above.${NC}"
+    exit 1
+fi
+
 x=$(az account list)
 accountname=$(az account show |jq -r .user.name)
 length=$(jq -n "$x" | jq '. | length')
@@ -58,7 +65,6 @@ else
 fi
 
 SubscriptionId=$(jq -n "$x" | jq .["$((subscription_number-1))"].id -r)
-AZ_VERSION=$(az --version | grep -Po 'azure\-cli.*\K(\d+\.\d+\.\d+)')
 
 az account set --subscription $SubscriptionId
 
@@ -78,16 +84,9 @@ TenantId=$(az account show --query tenantId -o tsv)
 
 
 echo -e "Creating AD application for CloudShell Colony"
-if [ $(ver $AZ_VERSION) -ge $(ver 2.0.55) ]; then
-    AppKey=$(az ad sp create-for-rbac -n $AppName | jq -r '.password') ||  quit_on_err "The user that runs the script should be an Owner."
-else
-    AppKey=$(openssl rand -base64 32)
-    az ad sp create-for-rbac -n $AppName --password $AppKey $SubscriptionId ||  quit_on_err "The user that runs the script should be an Owner."
-fi
+AppKey=$(az ad sp create-for-rbac -n $AppName | jq -r '.password') ||  quit_on_err "The user that runs the script should be an Owner."
 AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
 az ad sp credential reset -n $AppName --password $AppKey --end-date '2299-12-31'
-
-
 
 
 echo -e "Configuring access to Azure API"
