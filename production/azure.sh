@@ -80,6 +80,7 @@ AppName=$(echo "COLONY-"$COLONY_RANDOM)
 ColonyMgmtRG=$(echo "colony-"$COLONY_RANDOM)
 StorageName=$(echo "colony"$COLONY_RANDOM)
 TenantId=$(az account show --query tenantId -o tsv)
+SidecarIdentityName=$(echo $ColonyMgmtRG"-sidecar-identity")
 
 
 echo -e "Creating AD application for CloudShell Colony"
@@ -124,12 +125,14 @@ fi
 echo -e "$GREEN---Creating table in storage account"$NC
 az storage table create -n colonySandboxes  --account-name $StorageName
 
-#3. create power identity
-IdentityName = $ColonyMgmtRG
-echo -e "$GREEN---Creating managed identity (3/3) "$IdentityName$NC
-IdentityPrincipalId=$(az identity create -n $IdentityName -g $ColonyMgmtRG -l $REGION --query principalId --out tsv)
+#3. create sidecar identity
+echo -e "$GREEN---Creating managed identity (3/3) "$SidecarIdentityName$NC
+SidecarIdentityPrincipalId=$(az identity create -n $SidecarIdentityName -g $ColonyMgmtRG -l $REGION --query principalId --out tsv)
+# todo: verify success?
+
 # assigning the identity with Contributor role in the subscription
-az role assignment create --assignee-object-id $IdentityPrincipalId --assignee-principal-type "ServicePrincipal" --role "Contributor" --scope "/subscriptions/"$SubscriptionId
+az role assignment create --assignee-object-id $SidecarIdentityPrincipalId --assignee-principal-type "ServicePrincipal" --role "Contributor" --scope "/subscriptions/"$SubscriptionId
+# todo: verify success?
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo "Copy the text below and paste it into Colony's Azure authentication page"
