@@ -127,12 +127,12 @@ az storage table create -n colonySandboxes  --account-name $StorageName
 
 #3. create sidecar identity
 echo -e "$GREEN---Creating managed identity (3/3) "$SidecarIdentityName$NC
-SidecarIdentityPrincipalId=$(az identity create -n $SidecarIdentityName -g $ColonyMgmtRG -l $REGION --query principalId --out tsv) \ 
+SidecarIdentityPrincipalId=$(az identity create -n $SidecarIdentityName -g $ColonyMgmtRG -l $REGION --query principalId --out tsv) \
   || quit_on_err "Error creating managed identity"
 
 # assigning the identity with Contributor role in the subscription
 echo -e "$GREEN---Assigning role to the managed identity"$NC
-az role assignment create --assignee-object-id $SidecarIdentityPrincipalId --assignee-principal-type "ServicePrincipal" --role "Contributor" --scope "/subscriptions/"$SubscriptionId \ 
+az role assignment create --assignee-object-id $SidecarIdentityPrincipalId --assignee-principal-type "ServicePrincipal" --role "Contributor" --scope "/subscriptions/"$SubscriptionId \
   || quit_on_err "Error assigning role to managed identity"
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
