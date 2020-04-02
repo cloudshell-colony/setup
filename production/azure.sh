@@ -127,12 +127,13 @@ az storage table create -n colonySandboxes  --account-name $StorageName
 
 #3. create sidecar identity
 echo -e "$GREEN---Creating managed identity (3/3) "$SidecarIdentityName$NC
-SidecarIdentityPrincipalId=$(az identity create -n $SidecarIdentityName -g $ColonyMgmtRG -l $REGION --query principalId --out tsv)
-# todo: verify success?
+SidecarIdentityPrincipalId=$(az identity create -n $SidecarIdentityName -g $ColonyMgmtRG -l $REGION --query principalId --out tsv) \ 
+  || quit_on_err "Error creating managed identity"
 
 # assigning the identity with Contributor role in the subscription
-az role assignment create --assignee-object-id $SidecarIdentityPrincipalId --assignee-principal-type "ServicePrincipal" --role "Contributor" --scope "/subscriptions/"$SubscriptionId
-# todo: verify success?
+echo -e "$GREEN---Assigning role to the managed identity"$NC
+az role assignment create --assignee-object-id $SidecarIdentityPrincipalId --assignee-principal-type "ServicePrincipal" --role "Contributor" --scope "/subscriptions/"$SubscriptionId \ 
+  || quit_on_err "Error assigning role to managed identity"
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo "Copy the text below and paste it into Colony's Azure authentication page"
