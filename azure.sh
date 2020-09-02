@@ -80,6 +80,7 @@ AppName=$(echo "COLONY-"$COLONY_RANDOM)
 ColonyMgmtRG=$(echo "colony-"$COLONY_RANDOM)
 StorageName=$(echo "colony"$COLONY_RANDOM)
 TenantId=$(az account show --query tenantId -o tsv)
+SidecarIdentityName=$(echo $ColonyMgmtRG"-sidecar-identity")
 
 
 echo -e "Creating AD application for CloudShell Colony"
@@ -101,7 +102,7 @@ echo -e "\n\nApplication Name : $AppName \nApplication ID : $AppId \nApplication
 
 
 #1.create resource group:
-echo -e "$GREEN---Creating resource group (1/2) "$ColonyMgmtRG$NC
+echo -e "$GREEN---Creating resource group (1/3) "$ColonyMgmtRG$NC
 az group create -l $REGION -n $ColonyMgmtRG --tags colony-mgmt-group='' owner=$accountname
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
@@ -111,7 +112,7 @@ if [ ! "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
 fi
 
 #2.Create the storage account:
-echo -e "$GREEN---Creating storage account (2/2) "$StorageName$NC
+echo -e "$GREEN---Creating storage account (2/3) "$StorageName$NC
 az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS  --kind StorageV2 --tags colony-mgmt-storage=''
 echo "---Verifing storage account exists "$StorageName 
 
@@ -123,6 +124,16 @@ fi
 
 echo -e "$GREEN---Creating table in storage account"$NC
 az storage table create -n colonySandboxes  --account-name $StorageName
+
+#3. create sidecar identity
+echo -e "$GREEN---Creating managed identity (3/3) "$SidecarIdentityName$NC
+SidecarIdentityPrincipalId=$(az identity create -n $SidecarIdentityName -g $ColonyMgmtRG -l $REGION --query principalId --out tsv) \
+  || quit_on_err "Error creating managed identity"
+
+# assigning the identity with Contributor role in the subscription
+echo -e "$GREEN---Assigning role to the managed identity"$NC
+az role assignment create --assignee-object-id $SidecarIdentityPrincipalId --assignee-principal-type "ServicePrincipal" --role "Contributor" --scope "/subscriptions/"$SubscriptionId \
+  || quit_on_err "Error assigning role to managed identity"
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo "Copy the text below and paste it into Colony's Azure authentication page"

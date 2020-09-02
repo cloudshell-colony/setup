@@ -24,6 +24,13 @@ echo -e "$GREEN Please wait while we setup the integration with your Azure accou
 echo -e "This script grants Cloud Shell Colony permissions to your account and\ncreates a small management layer that will keep your data safe."
 echo -e "For more information visit: https://colonysupport.quali.com/hc/en-us/articles/360008858093-Granting-access-to-your-Azure-account\n\n"
 #========================================================================================
+
+AZ_VERSION=$(az --version | grep -Po 'azure\-cli.*\K(\d+\.\d+\.\d+)')
+if [ $(ver $AZ_VERSION) -lt $(ver 2.0.69) ]; then
+    echo -e "${RED}Unsupported azure-cli version of $AZ_VERSION. Please update to version 2.0.68 or above.${NC}"
+    exit 1
+fi
+
 x=$(az account list)
 accountname=$(az account show |jq -r .user.name)
 length=$(jq -n "$x" | jq '. | length')
@@ -58,14 +65,12 @@ else
 fi
 
 SubscriptionId=$(jq -n "$x" | jq .["$((subscription_number-1))"].id -r)
-AZ_VERSION=$(az --version | grep -Po 'azure\-cli.*\K(\d+\.\d+\.\d+)')
 
 az account set --subscription $SubscriptionId
 
 echo -e "Running with settings:"
 echo -e "Subscription:" $GREEN$(jq -n "$x" | jq .["$((subscription_number-1))"].name )  $SubscriptionId$NC
 echo -e "Region $GREEN$REGION$NC"
-echo -e "Azure-cli version: $AZ_VERSION"
 
 #========================================================================================
 
@@ -75,19 +80,13 @@ AppName=$(echo "COLONY-"$COLONY_RANDOM)
 ColonyMgmtRG=$(echo "colony-"$COLONY_RANDOM)
 StorageName=$(echo "colony"$COLONY_RANDOM)
 TenantId=$(az account show --query tenantId -o tsv)
+SidecarIdentityName=$(echo $ColonyMgmtRG"-sidecar-identity")
 
 
 echo -e "Creating AD application for CloudShell Colony"
-if [ $(ver $AZ_VERSION) -ge $(ver 2.0.55) ]; then
-    AppKey=$(az ad sp create-for-rbac -n $AppName | jq -r '.password') ||  quit_on_err "The user that runs the script should be an Owner."
-else
-    AppKey=$(openssl rand -base64 32)
-    az ad sp create-for-rbac -n $AppName --password $AppKey $SubscriptionId ||  quit_on_err "The user that runs the script should be an Owner."
-fi
+AppKey=$(az ad sp create-for-rbac -n $AppName | jq -r '.password') ||  quit_on_err "The user that runs the script should be an Owner."
 AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
 az ad sp credential reset -n $AppName --password $AppKey --end-date '2299-12-31'
-
-
 
 
 echo -e "Configuring access to Azure API"
@@ -103,7 +102,7 @@ echo -e "\n\nApplication Name : $AppName \nApplication ID : $AppId \nApplication
 
 
 #1.create resource group:
-echo -e "$GREEN---Creating resource group (1/2) "$ColonyMgmtRG$NC
+echo -e "$GREEN---Creating resource group (1/3) "$ColonyMgmtRG$NC
 az group create -l $REGION -n $ColonyMgmtRG --tags colony-mgmt-group='' owner=$accountname
 echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
@@ -113,7 +112,7 @@ if [ ! "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
 fi
 
 #2.Create the storage account:
-echo -e "$GREEN---Creating storage account (2/2) "$StorageName$NC
+echo -e "$GREEN---Creating storage account (2/3) "$StorageName$NC
 az storage account create -n $StorageName -g $ColonyMgmtRG -l $REGION --sku Standard_LRS  --kind StorageV2 --tags colony-mgmt-storage=''
 echo "---Verifing storage account exists "$StorageName 
 
@@ -125,6 +124,16 @@ fi
 
 echo -e "$GREEN---Creating table in storage account"$NC
 az storage table create -n colonySandboxes  --account-name $StorageName
+
+#3. create sidecar identity
+echo -e "$GREEN---Creating managed identity (3/3) "$SidecarIdentityName$NC
+SidecarIdentityPrincipalId=$(az identity create -n $SidecarIdentityName -g $ColonyMgmtRG -l $REGION --query principalId --out tsv) \
+  || quit_on_err "Error creating managed identity"
+
+# assigning the identity with Contributor role in the subscription
+echo -e "$GREEN---Assigning role to the managed identity"$NC
+az role assignment create --assignee-object-id $SidecarIdentityPrincipalId --assignee-principal-type "ServicePrincipal" --role "Contributor" --scope "/subscriptions/"$SubscriptionId \
+  || quit_on_err "Error assigning role to managed identity"
 
 echo -e "\n\n\n-------------------------------------------------------------------------"
 echo "Copy the text below and paste it into Colony's Azure authentication page"
