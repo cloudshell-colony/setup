@@ -3,6 +3,25 @@ export AZURE_HTTP_USER_AGENT='pid-0b87316f-9d3a-427e-88cf-399fc4100b33'
 
 function quit_on_err { echo $1; exit; }
 function ver { printf "%03d%03d%03d%03d" $(echo "$1" | tr '.' ' '); }          
+function retry(){
+    max_retries=$1
+    command="$2"
+    retries=0
+    while [ $retries \< $max_retries ]; do
+        output=$($command 2>&1)
+        exit_code=$?
+        if [ $exit_code == 0 ]; then
+            break
+        elif [[ $output == *"too many 500 error responses"* ]]; then
+            sleep 1
+        else 
+            break
+        fi
+        retries=$((retries+1))
+    done
+    echo "$output"
+    return $exit_code
+}
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -127,7 +146,7 @@ az storage table create -n colonySandboxes  --account-name $StorageName
 
 #3. create sidecar identity
 echo -e "$GREEN---Creating managed identity (3/3) "$SidecarIdentityName$NC
-SidecarIdentityPrincipalId=$(az identity create -n $SidecarIdentityName -g $ColonyMgmtRG -l $REGION --query principalId --out tsv) \
+SidecarIdentityPrincipalId=$(retry 5 "az identity create -n $SidecarIdentityName -g $ColonyMgmtRG -l $REGION --query principalId --out tsv") \
   || quit_on_err "Error creating managed identity"
 
 # assigning the identity with Contributor role in the subscription
