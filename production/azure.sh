@@ -2,24 +2,37 @@
 export AZURE_HTTP_USER_AGENT='pid-0b87316f-9d3a-427e-88cf-399fc4100b33'
 
 function quit_on_err { echo $1; exit; }
-function ver { printf "%03d%03d%03d%03d" $(echo "$1" | tr '.' ' '); }          
+function ver { printf "%03d%03d%03d%03d" $(echo "$1" | tr '.' ' '); }    
+function run_and_capture {
+    typeset -n var_out=$1
+    typeset -n var_err=$2
+    typeset -n var_code=$3
+    seperator=$(uuidgen)
+    std=$(
+        { stdout=$($4) ; } 2>&1
+        echo -e "$seperator$stdout$seperator$?"
+    )
+    var_err="${std%%$seperator*}"; std="${std#*$seperator}"
+    var_out="${std%%$seperator*}"; std="${std#*$seperator}"
+    var_code="${std%%$seperator*}"; std="${std#*$seperator}"
+}      
 function retry(){
     max_retries=$1
     command="$2"
     retries=0
     while [ $retries \< $max_retries ]; do
-        output=$($command 2>&1)
-        exit_code=$?
-        if [ $exit_code == 0 ]; then
+        run_and_capture stdout stderr exit_code "$command"
+        echo "$stderr" >&2
+        if [ $exit_code == "0" ]; then
             break
-        elif [[ $output == *"too many 500 error responses"* ]]; then
+        elif [[ "$stderr" == *"too many 500 error responses"* ]]; then
             sleep 1
         else 
             break
         fi
         retries=$((retries+1))
     done
-    echo "$output"
+    echo "$stdout"
     return $exit_code
 }
 
@@ -123,7 +136,10 @@ echo -e "\n\nApplication Name : $AppName \nApplication ID : $AppId \nApplication
 #1.create resource group:
 echo -e "$GREEN---Creating resource group (1/3) "$ColonyMgmtRG$NC
 az group create -l $REGION -n $ColonyMgmtRG --tags colony-mgmt-group='' owner=$accountname
-echo "---Verifing Resource group exists "$ColonyMgmtRG 
+echo "---Verifing Resource group execho -e "Creating AD application for CloudShell Colony"
+AppKey=$(az ad sp create-for-rbac -n $AppName | jq -r '.password') ||  quit_on_err "The user that runs the script should be an Owner."
+AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
+az ad sp credential reset -n $AppName --password $AppKey --end-date '2299-12-31'ists "$ColonyMgmtRG 
 
 if [ ! "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
         echo "Error resource group does not exists" 
