@@ -7,7 +7,7 @@ function run_and_capture {
     typeset -n var_out=$1
     typeset -n var_err=$2
     typeset -n var_code=$3
-    seperator=$(uuidgen)
+    seperator=$(dbus-uuidgen)
     std=$(
         { stdout=$($4) ; } 2>&1
         echo -e "$seperator$stdout$seperator$?"
