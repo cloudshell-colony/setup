@@ -136,10 +136,7 @@ echo -e "\n\nApplication Name : $AppName \nApplication ID : $AppId \nApplication
 #1.create resource group:
 echo -e "$GREEN---Creating resource group (1/3) "$ColonyMgmtRG$NC
 az group create -l $REGION -n $ColonyMgmtRG --tags colony-mgmt-group='' owner=$accountname
-echo "---Verifing Resource group execho -e "Creating AD application for CloudShell Colony"
-AppKey=$(az ad sp create-for-rbac -n $AppName | jq -r '.password') ||  quit_on_err "The user that runs the script should be an Owner."
-AppId=$(az ad app list --display-name $AppName | jq '.[0].appId' | tr -d \")
-az ad sp credential reset -n $AppName --password $AppKey --end-date '2299-12-31'ists "$ColonyMgmtRG 
+echo "---Verifing Resource group exists "$ColonyMgmtRG 
 
 if [ ! "$(az group exists -n $ColonyMgmtRG)" = "true" ]; then
         echo "Error resource group does not exists" 
