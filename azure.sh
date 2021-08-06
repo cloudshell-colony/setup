@@ -1,5 +1,5 @@
 #!/bin/bash
-export AZURE_HTTP_USER_AGENT='pid-0b87316f-9d3a-427e-88cf-399fc4100b33'
+export AZURE_HTTP_USER_AGENT='pid-5d52b2b7-4e3e-5534-8a7a-53fab37a29fb'
 
 function quit_on_err { echo $1; exit; }
 function ver { printf "%03d%03d%03d%03d" $(echo "$1" | tr '.' ' '); }    
